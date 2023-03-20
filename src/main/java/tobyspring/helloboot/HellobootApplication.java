@@ -8,6 +8,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -44,7 +45,7 @@ public class HellobootApplication {
                 @Override
                 protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
                     // super.service(req, resp);
-                    String name = req.getParameter("name");
+                    // String name = req.getParameter("name");
 
                     /**
                      * 웹 응답의 3가지 요소
@@ -53,22 +54,37 @@ public class HellobootApplication {
                      * (3) Body
                      */
 
+                    // (1) status Code
                     // resp.setStatus(200);
-                    resp.setStatus(HttpStatus.OK.value());
+                    // resp.setStatus(HttpStatus.OK.value());
 
+                    // (2) Header
                     // resp.setHeader("Content-Type", "text/plain"); // <- 오타의 위험성이 있음
-                    resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+                    // resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
 
+                    // (3) Body
                     // resp.getWriter().println("Hello Servlet");
-                    resp.getWriter().println("Hello " + name);
+                    // resp.getWriter().println("Hello " + name);
+
+                    if(req.getRequestURI().equals("/hello") && req.getMethod().equals(HttpMethod.GET.name())) {
+                        String name = req.getParameter("name");
+
+                        resp.setStatus(HttpStatus.OK.value());
+                        resp.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE);
+                        resp.getWriter().println("Hello " + name);
+                    } else if (req.getRequestURI().equals("/user")){
+
+                    } else {
+                        resp.setStatus(HttpStatus.NOT_FOUND.value());
+                    }
                 }
-            }).addMapping("/hello"); // <-- hello 라고 들어오는 요청이 있으면 처리하겠다.
+            }).addMapping("/*"); // <-- 라고 들어오는 요청이 있으면 처리하겠다.
         });
 
         webServer.start();
 
         System.out.println("SOSOSOSOSO HEE");
-       // SpringApplication.run(HellobootApplication.class, args);
+       // SpringApplication.run(HellobootApplication.class, args); // -> HTTP ERROR 404
     }
 
 }
